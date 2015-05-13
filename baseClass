@@ -1,5 +1,0 @@
-
-
-class tf(file):
-    def __init__(self, file):
-        with open(file, 'r', )
