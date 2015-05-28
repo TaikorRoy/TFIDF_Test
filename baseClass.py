@@ -26,13 +26,6 @@ class TfParser(object):
                 tf_vector[pos] += 1
         return vector_space, tf_vector
 
-f_path = r"C:\workspace\pynlpir_TFIDF\test.txt"
-
-
-#parser = TfParser(f_path)   #construct a parser
-#print(parser())
-
-
 class BatchProcessor(object):
     def __init__(self, folder_path):
         tf_vector = list()
@@ -45,6 +38,7 @@ class BatchProcessor(object):
             tf_vector.append(vector_buffer)
             global_pos = global_pos | pos_buffer
         self.global_pos = global_pos
+        self.df = None
         self.tf_vector = tf_vector
         self.N = N
 
@@ -54,6 +48,8 @@ class BatchProcessor(object):
             intersection = set(vector.keys()) & self.global_pos
             for element in intersection:
                 global_pos_list[element] += 1
+
+        self.df = global_pos_list
 
         for key in global_pos_list.keys():
             global_pos_list[key] = math.log(self.N/global_pos_list[key], 10)
@@ -67,11 +63,32 @@ class BatchProcessor(object):
                 vector[key] *= idf[key]
         return self.tf_vector     #transmform tf vector into tfidf vector
 
+class feature_selection(object):
+    def __init__(self, mode, max_feature):
+        self.mode = mode
+        self.max_feature = max_feature
 
+    def df_rank(self, df):
+        df_ranked_list = sorted(df.items(), key = lambda d:d[1])
 
+    def select(self, df):
+        df_list = self.df_rank(df)
+        compare = [self.max_feature, len(df_list)]
+        feature_shape = max(compare)
+        feature = list()
+        for i in range(feature_shape):
+            feature.append(df_list[i][0])
+        return feature
 
 folder_path = r'C:\workspace\训练数据\训练结果测试\corpos\training_set\有效'
 bp = BatchProcessor(folder_path)
 tf_idf = bp.tfidf()
-print(tf_idf)
+print(bp.df)
+"""
+selector = feature_selection(1, 200)
+
+feature = selector.select(bp.df)
+
+print(feature)
+"""
 
